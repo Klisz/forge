@@ -15,6 +15,7 @@ import forge.card.*;
 import forge.deck.Deck;
 import forge.deck.DeckProxy;
 import forge.deck.DeckgenUtil;
+import forge.game.GameType;
 import forge.gui.GuiBase;
 import forge.item.PaperCard;
 import forge.localinstance.properties.ForgeConstants;
@@ -257,6 +258,9 @@ public class Config {
                     }
                 }
             case Chaos:
+                if ("Commander".equalsIgnoreCase(configData.chaosDeckFormat)) {
+                    return DeckgenUtil.generateCommanderDeck(false, GameType.Commander);
+                }
                 return DeckgenUtil.getRandomOrPreconOrThemeDeck("", false, false, false, configData.allowedEditions);
             case Custom:
                 return DeckProxy.getAllCustomStarterDecks().get(index).getDeck();
@@ -360,6 +364,16 @@ public class Config {
             adventures.set(i, "<user>" + adventures.get(i));
         }
         adventures.addAll(this.adventures);
+
+        // A hard-coded list of planes that are currently not finished and are considered to be in development
+        // (these planes will only appear in the choice box if Developer Mode is enabled in Forge)
+        // TODO: migrate this to an externally configurable ini or json file
+        if (!FModel.getPreferences().getPrefBoolean(ForgePreferences.FPref.DEV_MODE_ENABLED)) {
+            adventures.removeValue("Amonkhet", false);
+            adventures.removeValue("Innistrad", false);
+            adventures.removeValue("Crystal_Kingdoms", false);
+        }
+
         return adventures;
     }
 
